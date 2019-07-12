@@ -30,7 +30,7 @@ function indent() {
   esac
 }
 # SCINOTE: Packages to be installed via apt-get, separated with whitespace
-packages="libfile-basedir-perl libfile-mimeinfo-perl libsm6 libice6 libxinerama1 libdbus-glib-1-2 libharfbuzz0b libharfbuzz-icu0"
+packages="libfile-basedir-perl libfile-mimeinfo-perl libsm6 libice6 libxinerama1 libdbus-glib-1-2 libharfbuzz0b libharfbuzz-icu0 poppler-utils"
 
 APT_CACHE_DIR="$CACHE_DIR/apt/cache"
 APT_STATE_DIR="$CACHE_DIR/apt/state"
