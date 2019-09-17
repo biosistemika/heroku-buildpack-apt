@@ -53,7 +53,7 @@ do
     curl -s -L -z $PACKAGE_FILE -o $PACKAGE_FILE $PACKAGE 2>&1 | indent
   else
     topic "Fetching .debs for $PACKAGE"
-    apt-get $APT_OPTIONS -y --force-yes -d install --reinstall $PACKAGE | indent
+    apt-get $APT_OPTIONS -y --force-yes -d install --no-install-recommends --reinstall $PACKAGE | indent
   fi
 done
 
@@ -90,6 +90,3 @@ export PERL5LIB="/app/.apt/usr/share/perl5"
 
 #give environment to later buildpacks
 export | grep -E -e '(PATH|LD_LIBRARY_PATH|LIBRARY_PATH|INCLUDE_PATH|CPATH|CPPPATH|PKG_CONFIG_PATH|OFFICE_PATH)='  > "$LP_DIR/export"
-
-
-
