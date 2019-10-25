@@ -30,7 +30,9 @@ function indent() {
   esac
 }
 # SCINOTE: Packages to be installed via apt-get, separated with whitespace
-packages="libfile-basedir-perl libfile-mimeinfo-perl libsm6 libice6 libxinerama1 libdbus-glib-1-2 libharfbuzz0b libharfbuzz-icu0 poppler-utils librsvg2-2 libvips42"
+packages="libfile-basedir-perl libfile-mimeinfo-perl libsm6 libice6 libxinerama1 libdbus-glib-1-2 libharfbuzz0b libharfbuzz-icu0 poppler-utils librsvg2-2 libgif-dev libgif7"
+
+LIBVIPS_VERSION="8.7.4"
 
 APT_CACHE_DIR="$CACHE_DIR/apt/cache"
 APT_STATE_DIR="$CACHE_DIR/apt/state"
@@ -64,10 +66,24 @@ for DEB in $(ls -1 $APT_CACHE_DIR/archives/*.deb); do
   dpkg -x $DEB $BUILD_DIR/.apt/
 done
 
+# Building libvips from sources
+mkdir -p $CACHE_DIR/libvips_build
+cd $CACHE_DIR/libvips_build
+if [[ ! -e "vips-$LIBVIPS_VERSION" ]]; then
+  wget -q "https://github.com/libvips/libvips/releases/download/v$LIBVIPS_VERSION/vips-$LIBVIPS_VERSION.tar.gz"
+  tar xf "vips-$LIBVIPS_VERSION.tar.gz"
+fi
+
+cd "vips-$LIBVIPS_VERSION"
+export LIBRARY_PATH="$BUILD_DIR/.apt/usr/lib/x86_64-linux-gnu:$BUILD_DIR/.apt/usr/lib:$LIBRARY_PATH"
+export INCLUDE_PATH="$BUILD_DIR/.apt/usr/include:$INCLUDE_PATH"
+./configure --prefix=$BUILD_DIR/.apt/usr --with-giflib-libraries=$BUILD_DIR/.apt/usr/lib/ --with-giflib-includes=$BUILD_DIR/.apt/usr/include/
+make install
+rm -f "../vips-$LIBVIPS_VERSION.tar.gz"
+
 # Required for ruby-vips
 ln -s /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0 $BUILD_DIR/.apt/usr/lib/x86_64-linux-gnu/libglib-2.0.so
 ln -s /usr/lib/x86_64-linux-gnu/libgobject-2.0.so.0 $BUILD_DIR/.apt/usr/lib/x86_64-linux-gnu/libgobject-2.0.so
-ln -s /app/.apt/usr/lib/x86_64-linux-gnu/libvips.so.42 $BUILD_DIR/.apt/usr/lib/x86_64-linux-gnu/libvips.so
 
 # SCINOTE: Add any additional environmental variables here (twice!)
 topic "Writing profile script"
